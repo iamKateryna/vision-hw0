@@ -8,9 +8,9 @@ for row in range(im.h):
 save_image(im, "dog_no_red")
 
 # 3. Grayscale image
-im = load_image("data/colorbar.png")
+im = load_image("data/dog.jpg")
 graybar = rgb_to_grayscale(im)
-save_image(graybar, "graybar")
+save_image(graybar, "graydog")
 
 # 4. Shift Image
 im = load_image("data/dog.jpg")
@@ -30,5 +30,3 @@ shift_image(im, 1, .2)
 clamp_image(im)
 hsv_to_rgb(im)
 save_image(im, "dog_saturated")
-
-
