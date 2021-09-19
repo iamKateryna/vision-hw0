@@ -38,11 +38,14 @@ void set_pixel(image im, int x, int y, int c, float v) {
 image copy_image(image im) {
     image copy = make_image(im.w, im.h, im.c);
     // TODO Fill this in
-    for(int i = 0; i < im.w*im.h*im.c; i++){
-        copy.data[i] = im.data[i];
-    }
+    //for(int i = 0; i < im.w*im.h*im.c; i++){
+    //    copy.data[i] = im.data[i];
+    //}
+    int size = im.w*im.h*im.c;
+    memcpy(copy.data, im.data, size);
     return copy;
 }
+
 
 //проходимось по усім пікселям, використовуючи luma calculation отримуємо відтінок сірого
 image rgb_to_grayscale(image im) {
@@ -54,7 +57,7 @@ image rgb_to_grayscale(image im) {
             float r = get_pixel(im, i, j, 0);
             float g = get_pixel(im, i, j, 1);
             float b = get_pixel(im, i, j, 2);
-            gray.data[i + (im.w * j)] = (0.299 * r) + (0.587 * g) + (0.114 * b);
+            gray.data[i + (im.w * j)] = (0.499 * r) + (0.587 * g) + (0.114 * b);
         }
     }
     return gray;
@@ -65,7 +68,7 @@ void shift_image(image im, int c, float v) {
     // TODO Fill this in
     for (int j = 0; j < im.h; j++){
         for (int i = 0; i < im.w; i++) {
-        float pixel = get_pixel(im, i,j,c);
+            float pixel = get_pixel(im, i,j,c);
             set_pixel(im, i, j, c, pixel + v);
         }
     }
@@ -106,6 +109,7 @@ void rgb_to_hsv(image im) {
             m = three_way_min(r, g, b);
 
             c = v - m;
+
             if ( v != 0 ) {
                 s = c / v;
             } else{
@@ -115,9 +119,9 @@ void rgb_to_hsv(image im) {
             if ( c==0 ){
                 h = 0;
             } else if (v == r){
-                    h_primary = (g -b)/c;
+                h_primary = (g -b)/c;
             } else if (v == g){
-                    h_primary = (b - r)/c +2;
+                h_primary = (b - r)/c +2;
             }else{
                 h_primary = (r - g)/c +4;
                 }
@@ -149,51 +153,32 @@ void hsv_to_rgb(image im) {
             float m = v - c;
 
             float h_temp = h * 6;
+            //h_temp = round(h_temp);
 
             if(c == 0){
                 r = v;
                 g = v;
                 b = v;
-            } else if (h_temp > 5 && h_temp < 6) {
+            } else if (h_temp >= 5 && h_temp < 6) {
                 r = v;
                 g = m;
                 b = ((((h_temp /  6) - 1) * 6 * c) - g) * -1;
-            } else if (h_temp == 5) {
-                r = v;
-                g = m;
-                b = v;
-            } else if (h_temp < 5 && h_temp > 4) {
+            } else if (h_temp < 5 && h_temp >= 4) {
                 g = m;
                 r = (h_temp - 4) * c + g;
                 b = v;
-            } else if (h_temp == 4) {
-                r = m;
-                g = m;
-                b = v;
-            } else if (h_temp < 4 && h_temp > 3) {
+            } else if (h_temp < 4 && h_temp >= 3) {
                 r = m;
                 g = (((h_temp - 4) * c) - r) * -1;
                 b = v;
-            } else if (h_temp == 3) {
-                r = m;
-                g = v;
-                b = v;
-            } else if (h_temp < 3 && h_temp > 2) {
+            } else if (h_temp < 3 && h_temp >= 2) {
                 r = m;
                 g = v;
                 b = ((h_temp - 2) * c) + r;
-            } else if (h_temp == 2) {
-                r = m;
-                g = v;
-                b = m;
-            } else if (h_temp < 2 && h_temp > 1) {
+            } else if (h_temp < 2 && h_temp >= 1) {
                 g = v;
                 b = m;
                 r = (((h_temp - 2) * c) - b) * -1;
-            } else if (h_temp == 1) {
-                r = v;
-                g = v;
-                b = m;
             } else if (h_temp < 1 && h_temp > 0) {
                 r = v;
                 b = m;
