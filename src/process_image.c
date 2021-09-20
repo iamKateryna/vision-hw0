@@ -42,22 +42,22 @@ image copy_image(image im) {
     //    copy.data[i] = im.data[i];
     //}
     int size = im.w*im.h*im.c;
-    memcpy(copy.data, im.data, size);
+    memcpy(copy.data, im.data, sizeof(float)*size);
     return copy;
 }
 
 
 //проходимось по усім пікселям, використовуючи luma calculation отримуємо відтінок сірого
-image rgb_to_grayscale(image im) {
+image rgb_to_grayscale(image im)
+{
     assert(im.c == 3);
     image gray = make_image(im.w, im.h, 1);
-    // TODO Fill this in
-    for (int i = 0; i < im.w; i++){
-        for (int j = 0; j < im.h; j++){
-            float r = get_pixel(im, i, j, 0);
-            float g = get_pixel(im, i, j, 1);
-            float b = get_pixel(im, i, j, 2);
-            gray.data[i + (im.w * j)] = (0.499 * r) + (0.587 * g) + (0.114 * b);
+    for(int j=0; j < im.h; j++){
+        for(int i=0; i < im.w; i++){
+            float gray_pixel = 0.0;
+            float weighted_sum[3] = {0.299, 0.587, 0.114};
+            for (int c=0; c < 3; c++) gray_pixel += get_pixel(im, i, j, c) * weighted_sum[c];
+            set_pixel(gray, i, j, 0, gray_pixel);
         }
     }
     return gray;
@@ -110,26 +110,23 @@ void rgb_to_hsv(image im) {
 
             c = v - m;
 
-            if ( v != 0 ) {
+            if (  c != 0.0 ) {
                 s = c / v;
-            } else{
-                s = 0;
-            }
-
-            if ( c==0 ){
-                h = 0;
-            } else if (v == r){
-                h_primary = (g -b)/c;
-            } else if (v == g){
-                h_primary = (b - r)/c +2;
-            }else{
-                h_primary = (r - g)/c +4;
+                if (v == r){
+                    h_primary = (g -b)/c;
+                } else if (v == g){
+                    h_primary = (b - r)/c +2;
+                }else{
+                    h_primary = (r - g)/c +4;
                 }
-
-            if(h_primary < 0){
-                h = (h_primary/6) + 1;
+                if(h_primary < 0){
+                    h = (h_primary/6) + 1;
+                } else {
+                    h = (h_primary/6);
+                }
             } else {
-                h = (h_primary/6);
+                s = 0;
+                h = 0;
             }
             set_pixel(im, i, j, 0, h);
             set_pixel(im, i, j, 1, s);
